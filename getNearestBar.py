@@ -56,7 +56,7 @@ if makePlot:
     # get closest lat/lon
     x2,y2 = m(lons[ind]+180,lats[ind])
     m.scatter(x2,y2,marker='o',c='b',s=100)
-    #pl.savefig('5PM_example.pdf',bbox_inches='tight')
+    pl.savefig('5PM_example.png',bbox_inches='tight')
     pl.show()
 
 print("The absolute closest lat/lon that is 5PM LST is:\n\tlat: %.6f\n\tlon: %.6f\nIt's %.3f km away!" % (lats[ind],lons[ind]-180,dists[ind]/1000.))
