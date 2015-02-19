@@ -14,11 +14,12 @@ def declination(JD):
     return -23.45*np.cos(360./360.25*(JD+9))
 
 def getLat(lons,declination,h):
-    hourAngle = h/24.*2*np.pi -lons/180*np.pi
+    hourAngle = h/24.*2*np.pi +lons/180*np.pi
     x = np.sin(declination)/(np.sqrt((np.cos(declination)**2)*(np.cos(hourAngle)**2) + (np.sin(declination)**2)))
     y = np.cos(declination)*np.cos(hourAngle)/(np.sqrt((np.cos(declination)**2)*(np.cos(hourAngle)**2) + (np.sin(declination)**2)))
 
     a = np.arctan2(y,x)*180/np.pi
+    #a = np.arctan(-y/x)*180/np.pi
     a[np.where(a<-90)] += 180
     a[np.where(a>90)] -= 180
     return a
@@ -46,11 +47,13 @@ dists = haversine(lats,latHome,lons+180,lonHome)
 ind = np.where(dists == dists.min())[0][0]
 if makePlot:
     from mpl_toolkits.basemap import Basemap
-    m = Basemap(llcrnrlon=0,llcrnrlat=-80,urcrnrlon=360,urcrnrlat=80,projection='mill')
+    m = Basemap(llcrnrlon=0,llcrnrlat=-90,urcrnrlon=360,urcrnrlat=90,projection='mill')
     fig=pl.figure(figsize=(8,4.5))
     ax = fig.add_axes([0.05,0.05,0.9,0.85])
     m.drawcoastlines()
-    x, y = m(lons+180,lats)
+
+    slope = np.append(lats,lats[0])[1:]- np.insert(lats,0,lats[-1])[:-1]
+    x, y = m(lons[np.where(slope>0)]+180,lats[np.where(slope>0)])
     m.plot(x,y,lw=4,c='k')
     m.plot(x,y,lw=2,c='r')
     # get closest lat/lon
@@ -60,3 +63,4 @@ if makePlot:
     pl.show()
 
 print("The absolute closest lat/lon that is 5PM LST is:\n\tlat: %.6f\n\tlon: %.6f\nIt's %.3f km away!" % (lats[ind],lons[ind]-180,dists[ind]/1000.))
+
